@@ -35,6 +35,7 @@ in {
           files-to-prompt
           psutil
           regex
+          rustbpe
           tiktoken
           tokenizers
           torch

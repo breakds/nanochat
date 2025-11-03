@@ -40,6 +40,7 @@ in {
           torch
           uvicorn
           wandb
+          click
         ]))
       ];
     };

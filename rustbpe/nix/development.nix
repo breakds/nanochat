@@ -3,8 +3,8 @@
 let
   inherit (inputs) self nixpkgs crane advisory-db;
 in {
-  perSystem = { system, pkgs-dev, lib, ... }: let
-    craneLib = crane.mkLib pkgs-dev;
+  perSystem = { system, pkgs-rustbpe, lib, ... }: let
+    craneLib = crane.mkLib pkgs-rustbpe;
 
     src = craneLib.cleanCargoSource ../.;
     
@@ -13,14 +13,21 @@ in {
       strictDeps = true;
       buildInputs = [
         # Add additional build inputs here
-      ] ++ lib.optionals pkgs-dev.stdenv.isDarwin [
-        pkgs-dev.libiconv
+      ] ++ lib.optionals pkgs-rustbpe.stdenv.isDarwin [
+        pkgs-rustbpe.libiconv
       ];
     };
 
     cargoArtifacts = craneLib.buildDepsOnly commonArgs;
     
   in {
+    _module.args.pkgs-rustbpe = import nixpkgs {
+      inherit system;
+      config = {
+        allowUnfree = true;
+      };
+    };
+    
     checks = {
       rustbpe-clippy = craneLib.cargoClippy (commonArgs // { inherit cargoArtifacts; });
 
@@ -50,12 +57,12 @@ in {
     };
 
     devShells.rustbpe = let
-      pythonEnv = pkgs-dev.python3.withPackages (ps: with ps; [
+      pythonEnv = pkgs-rustbpe.python3.withPackages (ps: with ps; [
         numpy
       ]);
     in craneLib.devShell {
       checks = self.checks."${system}";
-      packages = with pkgs-dev; [
+      packages = with pkgs-rustbpe; [
         pythonEnv
         maturin
       ];

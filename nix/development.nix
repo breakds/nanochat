@@ -25,6 +25,25 @@ in {
       ];
     };
 
+    devShells.default = pkgs-dev.mkShell rec {
+      name = "nanochat";
+
+      packages = with pkgs-dev; [
+        (python3.withPackages (p: with p; [
+          datasets
+          fastapi
+          files-to-prompt
+          psutil
+          regex
+          tiktoken
+          tokenizers
+          torch
+          uvicorn
+          wandb
+        ]))
+      ];
+    };
+
     packages = {
       rustbpe = pkgs-dev.python3Packages.rustbpe;
     };
